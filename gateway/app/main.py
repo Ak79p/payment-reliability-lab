@@ -1,10 +1,9 @@
 from uuid import uuid4
 from fastapi import FastAPI
 from app.models import ChargeRequest
+from app.storage import charges
 
 app = FastAPI(title = "Fake Gateway")
-
-charges = {}
 
 @app.get("/")
 async def root():
@@ -27,3 +26,10 @@ async def charge(request: ChargeRequest):
     charges[request.idempotency_key] = response
 
     return response
+
+@app.get("/_charges")
+async def get_charges():
+    return {
+        "count": len(charges),
+        "charges": charges
+    }

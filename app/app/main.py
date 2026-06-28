@@ -15,3 +15,10 @@ async def health():
         connection.execute(text("SELECT 1"))
 
     return {"status": "ok"}
+
+@app.get("/_charges")
+async def get_charges():
+    return {
+        "count": len(charges),
+        "charges": charges
+    }
