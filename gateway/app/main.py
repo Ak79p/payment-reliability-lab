@@ -20,6 +20,9 @@ async def charge(request: ChargeRequest):
 
     response = {
         "charge_id": str(uuid4()),
+        "idempotency_key": request.idempotency_key,
+        "amount": request.amount,
+        "currency": request.currency,
         "status": "succeeded"
     }
 
@@ -31,5 +34,5 @@ async def charge(request: ChargeRequest):
 async def get_charges():
     return {
         "count": len(charges),
-        "charges": charges
+        "charges": list(charges.values())
     }
