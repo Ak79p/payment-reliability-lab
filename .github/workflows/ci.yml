@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: pip install -r requirements-test.txt
+
+      # docker compose up --build --wait builds all images from scratch,
+      # starts all three services, and blocks until every container whose
+      # healthcheck is defined in docker-compose.yml reports healthy.
+      # On a fresh CI runner there are no leftover volumes, so Postgres
+      # runs initdb and applies infra/schema.sql exactly once — the same
+      # cold-start path as `docker compose down -v && docker compose up`.
+      - name: Start full stack and wait for all healthchecks
+        run: docker compose up --build --wait
+
+      - name: Run integration tests
+        env:
+          ORDER_SERVICE_URL: http://localhost:8000
+          GATEWAY_URL: http://localhost:8001
+          TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/payments
+        run: pytest tests/integration/ -v
+
+      - name: Tear down stack and remove volumes
+        if: always()
+        run: docker compose down -v
