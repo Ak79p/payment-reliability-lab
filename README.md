@@ -13,7 +13,7 @@ The point isn't the application. It's the **test automation around it**, and the
 
 ## Architecture
 
-![Payment Reliability Lab architecture](images/architecture.svg)
+![Payment Reliability Lab architecture](images/architecture (1).svg)
 
 Three services run together via Docker Compose. The **Order Service** owns the checkout logic and is the only thing under test. The **Fake Gateway** stands in for a real payment processor (Stripe, Adyen, etc.) — it's deliberately controllable, so tests can force it to fail in specific ways. **PostgreSQL** holds the durable ledger that every test asserts against.
 

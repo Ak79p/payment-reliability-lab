@@ -1,0 +1,80 @@
+<svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" font-family="'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <style>
+      .title    { font-size: 22px; font-weight: 700; fill: #11181f; }
+      .subtitle { font-size: 13px; fill: #6b7888; }
+      .boxname  { font-size: 19px; font-weight: 700; fill: #1a2332; }
+      .boxrole  { font-size: 12px; font-weight: 600; letter-spacing: 0.4px; }
+      .boxport  { font-size: 12px; fill: #8a97a6; font-family: 'SF Mono','Consolas',monospace; }
+      .flow     { font-size: 13px; font-weight: 600; fill: #46566a; }
+      .flowsub  { font-size: 11.5px; fill: #8a97a6; }
+    </style>
+    <marker id="aGrey" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#9aa7b5"/>
+    </marker>
+    <marker id="aGreen" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#1f9d6b"/>
+    </marker>
+    <marker id="aAmber" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#cc8b2c"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="620" fill="#fbfcfd"/>
+
+  <!-- Title -->
+  <text x="450" y="50" text-anchor="middle" class="title">Payment Reliability Lab</text>
+  <text x="450" y="74" text-anchor="middle" class="subtitle">Tests assert against the database and the gateway &#8212; never the HTTP response alone.</text>
+
+  <!-- ============ TEST HARNESS (top) ============ -->
+  <rect x="270" y="110" width="360" height="74" rx="12" fill="#eef3f8" stroke="#cdd9e6" stroke-width="2"/>
+  <text x="450" y="142" text-anchor="middle" class="boxrole" fill="#3f78c4">TEST HARNESS</text>
+  <text x="450" y="165" text-anchor="middle" class="boxname" font-size="16">pytest</text>
+
+  <!-- harness -> order service -->
+  <line x1="450" y1="184" x2="450" y2="232" stroke="#9aa7b5" stroke-width="2" marker-end="url(#aGrey)"/>
+
+  <!-- ============ ORDER SERVICE (center) ============ -->
+  <rect x="290" y="234" width="320" height="96" rx="12" fill="#ffffff" stroke="#1f9d6b" stroke-width="3"/>
+  <text x="450" y="264" text-anchor="middle" class="boxrole" fill="#1f9d6b">SYSTEM UNDER TEST</text>
+  <text x="450" y="292" text-anchor="middle" class="boxname">Order Service</text>
+  <text x="450" y="314" text-anchor="middle" class="boxport">:8000</text>
+
+  <!-- order service -> gateway (charge, green, left side) -->
+  <path d="M340 330 L210 410" fill="none" stroke="#1f9d6b" stroke-width="2.5" marker-end="url(#aGreen)"/>
+
+  <!-- order service -> postgres (writes, grey, right side) -->
+  <path d="M560 330 L690 410" fill="none" stroke="#9aa7b5" stroke-width="2.5" marker-end="url(#aGrey)"/>
+
+  <!-- ============ FAKE GATEWAY (bottom left) ============ -->
+  <rect x="70" y="424" width="290" height="96" rx="12" fill="#ffffff" stroke="#cc8b2c" stroke-width="2.5"/>
+  <text x="215" y="454" text-anchor="middle" class="boxrole" fill="#cc8b2c">TEST DOUBLE</text>
+  <text x="215" y="482" text-anchor="middle" class="boxname">Fake Gateway</text>
+  <text x="215" y="504" text-anchor="middle" class="boxport">:8001</text>
+
+  <!-- ============ POSTGRES (bottom right) ============ -->
+  <rect x="540" y="424" width="290" height="96" rx="12" fill="#ffffff" stroke="#3f5a78" stroke-width="2.5"/>
+  <text x="685" y="454" text-anchor="middle" class="boxrole" fill="#3f5a78">SOURCE OF TRUTH</text>
+  <text x="685" y="482" text-anchor="middle" class="boxname">PostgreSQL</text>
+  <text x="685" y="504" text-anchor="middle" class="boxport">:5432</text>
+
+  <!-- reconciler heal loop: postgres -> gateway (amber, along the bottom) -->
+  <path d="M540 496 L362 496" fill="none" stroke="#cc8b2c" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#aAmber)"/>
+
+  <!-- ============ FLOW LABELS (placed in clear space, away from arrows) ============ -->
+
+  <!-- charge label : left of the arrow, clear space -->
+  <text x="150" y="372" text-anchor="middle" class="flow" fill="#1f9d6b">charge</text>
+  <text x="150" y="389" text-anchor="middle" class="flowsub">money moves</text>
+
+  <!-- writes label : right of the arrow, clear space -->
+  <text x="750" y="372" text-anchor="middle" class="flow">writes</text>
+  <text x="750" y="389" text-anchor="middle" class="flowsub">order + payment</text>
+
+  <!-- reconcile label : centered below the bottom dashed line -->
+  <text x="451" y="540" text-anchor="middle" class="flow" fill="#cc8b2c">reconcile</text>
+  <text x="451" y="557" text-anchor="middle" class="flowsub">heal stranded orders by idempotency_key</text>
+
+  <!-- one-line thesis at very bottom -->
+  <text x="450" y="596" text-anchor="middle" class="subtitle" font-style="italic">A charge can succeed while its confirmation is lost &#8212; the reconciler closes that gap.</text>
+</svg>
