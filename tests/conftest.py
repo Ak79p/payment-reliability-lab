@@ -39,8 +39,7 @@ def db(engine):
     """
     Fresh connection for every test.
     """
-    with engine.connect() as connection:
-        yield connection
+    return engine
 
 @pytest.fixture(scope = "function", autouse = True)
 def clean_ledger(engine):

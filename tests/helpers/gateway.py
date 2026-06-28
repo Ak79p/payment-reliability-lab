@@ -2,9 +2,6 @@ import httpx
 from tests.conftest import GATEWAY_URL
 
 def gateway_charges_for_key(idempotency_key):
-    """
-    Return all gateway charges for a specific idempotency key.
-    """
     response = httpx.get(f"{GATEWAY_URL}/_charges")
     response.raise_for_status()
     charges = response.json()["charges"]
@@ -15,7 +12,4 @@ def gateway_charges_for_key(idempotency_key):
     ]
 
 def gateway_charge_count(idempotency_key):
-    """
-    Return the number of charges created for a specific idempotency key.
-    """
     return len(gateway_charges_for_key(idempotency_key))
