@@ -20,7 +20,8 @@ services:
       - postgres
     environment:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/payments
-
+      GATEWAY_URL: http://fake-gateway:8001
+      
   fake-gateway:
     build:
       context: ./gateway
