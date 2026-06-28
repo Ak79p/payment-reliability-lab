@@ -1,0 +1,106 @@
+<svg viewBox="0 0 1000 680" xmlns="http://www.w3.org/2000/svg" font-family="'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <style>
+      .label   { font-size: 16px; font-weight: 700; fill: #1a2332; }
+      .sub     { font-size: 11.5px; fill: #5b6b7d; }
+      .port    { font-size: 10.5px; font-weight: 600; fill: #8a97a6; letter-spacing: 0.3px; }
+      .edge    { font-size: 11px; fill: #5b6b7d; }
+      .edgehi  { font-size: 11px; font-weight: 600; }
+      .role    { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; }
+      .mono    { font-family: 'SF Mono', 'Consolas', monospace; font-size: 10.5px; fill: #46566a; }
+      .title   { font-size: 19px; font-weight: 700; fill: #11181f; }
+      .caption { font-size: 12px; fill: #6b7888; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#8a97a6"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#1f9d6b"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#cc8b2c"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#3f78c4"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="680" fill="#fbfcfd"/>
+
+  <text x="40" y="46" class="title">Payment Reliability Lab &#8212; Architecture</text>
+  <text x="40" y="68" class="caption">The test harness drives the SUT and asserts against committed state, never the HTTP response alone.</text>
+
+  <rect x="40" y="96" width="920" height="92" rx="10" fill="#eef3f8" stroke="#cdd9e6" stroke-width="1.5"/>
+  <text x="60" y="120" class="role" fill="#3f78c4">TEST HARNESS &#183; pytest</text>
+  <text x="60" y="144" class="label">Drives requests &#183; arms chaos &#183; inspects committed state</text>
+  <text x="60" y="167" class="mono">httpx client   &#183;   fixtures (truncate-before, fresh key)   &#183;   DB + gateway inspection helpers</text>
+
+  <line x1="240" y1="188" x2="240" y2="232" stroke="#3f78c4" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="252" y="214" class="edgehi" fill="#3f78c4">drives /checkout, /reconcile</text>
+
+  <line x1="710" y1="188" x2="710" y2="318" stroke="#3f78c4" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrowBlue)"/>
+  <text x="722" y="232" class="edgehi" fill="#3f78c4">inspects</text>
+  <text x="722" y="248" class="edge">committed rows</text>
+
+  <rect x="40" y="236" width="320" height="158" rx="10" fill="#ffffff" stroke="#1f9d6b" stroke-width="2.5"/>
+  <text x="60" y="262" class="role" fill="#1f9d6b">SYSTEM UNDER TEST</text>
+  <text x="60" y="288" class="label">Order Service</text>
+  <text x="340" y="262" class="port" text-anchor="end">:8000 &#183; FastAPI</text>
+  <line x1="60" y1="302" x2="340" y2="302" stroke="#e6ecf2" stroke-width="1"/>
+  <text x="60" y="326" class="mono">POST /checkout</text>
+  <text x="60" y="348" class="mono">GET  /orders/{id}</text>
+  <text x="60" y="370" class="mono">POST /reconcile</text>
+  <text x="210" y="326" class="sub">persist &#8594; charge &#8594; settle</text>
+  <text x="210" y="348" class="sub">read order state</text>
+  <text x="210" y="370" class="sub">heal pending orders</text>
+
+  <rect x="40" y="452" width="320" height="178" rx="10" fill="#ffffff" stroke="#cc8b2c" stroke-width="2"/>
+  <text x="60" y="478" class="role" fill="#cc8b2c">TEST DOUBLE &#183; not under test</text>
+  <text x="60" y="504" class="label">Fake Payment Gateway</text>
+  <text x="340" y="478" class="port" text-anchor="end">:8001</text>
+  <line x1="60" y1="518" x2="340" y2="518" stroke="#e6ecf2" stroke-width="1"/>
+  <text x="60" y="542" class="mono">POST /charge</text>
+  <text x="60" y="564" class="mono">POST /_chaos</text>
+  <text x="60" y="586" class="mono">GET  /_charges</text>
+  <text x="60" y="608" class="mono">GET  /charge/{key}</text>
+  <text x="215" y="542" class="sub">records the charge</text>
+  <text x="215" y="564" class="sub">inject faults</text>
+  <text x="215" y="586" class="sub">inspect (tests)</text>
+  <text x="215" y="608" class="sub">lookup by key</text>
+
+  <rect x="600" y="330" width="360" height="178" rx="10" fill="#ffffff" stroke="#3f5a78" stroke-width="2"/>
+  <text x="620" y="356" class="role" fill="#3f5a78">SOURCE OF TRUTH</text>
+  <text x="620" y="382" class="label">PostgreSQL</text>
+  <text x="940" y="356" class="port" text-anchor="end">:5432</text>
+  <line x1="620" y1="396" x2="940" y2="396" stroke="#e6ecf2" stroke-width="1"/>
+  <text x="620" y="420" class="mono">orders</text>
+  <text x="760" y="420" class="sub">idempotency_key UNIQUE</text>
+  <text x="620" y="442" class="mono">payments</text>
+  <text x="760" y="442" class="sub">charge_id UNIQUE &#183; FK</text>
+  <text x="620" y="466" class="mono" fill="#9aa7b5">outbox</text>
+  <text x="760" y="466" class="sub" fill="#9aa7b5">provisioned (deferred)</text>
+  <text x="620" y="488" class="mono" fill="#9aa7b5">webhook_events</text>
+  <text x="760" y="488" class="sub" fill="#9aa7b5">provisioned (deferred)</text>
+
+  <path d="M360 310 C 500 310, 520 370, 596 392" fill="none" stroke="#3f5a78" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="420" y="332" class="edge">writes order + payment rows</text>
+
+  <path d="M150 394 L150 448" fill="none" stroke="#1f9d6b" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+  <text x="162" y="428" class="edgehi" fill="#1f9d6b">charge &#8212; money moves here</text>
+
+  <path d="M600 480 C 470 540, 450 560, 364 575" fill="none" stroke="#cc8b2c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrowAmber)"/>
+  <text x="372" y="556" class="edgehi" fill="#cc8b2c">reconciler re-queries</text>
+  <text x="372" y="571" class="edge" fill="#cc8b2c">by idempotency_key &#8594; heals to paid</text>
+
+  <rect x="600" y="528" width="360" height="102" rx="8" fill="#f7f9fb" stroke="#dde5ee" stroke-width="1"/>
+  <text x="620" y="550" class="role" fill="#5b6b7d">THE TWO SEAMS THAT MATTER</text>
+
+  <line x1="620" y1="568" x2="648" y2="568" stroke="#1f9d6b" stroke-width="3"/>
+  <text x="656" y="572" class="edge">charge &#8212; the moment money leaves the customer</text>
+
+  <line x1="620" y1="592" x2="648" y2="592" stroke="#cc8b2c" stroke-width="3" stroke-dasharray="6 4"/>
+  <text x="656" y="596" class="edge">heal &#8212; converge a stranded order to truth</text>
+
+  <text x="620" y="618" class="sub">A charge can succeed while its confirmation is lost.</text>
+  <text x="620" y="633" class="sub">The reconciler closes that gap.</text>
+</svg>
