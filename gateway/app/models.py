@@ -4,3 +4,6 @@ class ChargeRequest(BaseModel):
     amount: int
     currency: str
     idempotency_key: str
+
+class ChaosRequest(BaseModel):
+    mode: str | None = None
