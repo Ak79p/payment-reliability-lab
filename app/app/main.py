@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from app.db import engine, SessionLocal
 from app.models import CheckoutRequest
 from app.entities import Order, Payment
+from app.reconciler import reconcile
 
 GATEWAY_URL = os.getenv("GATEWAY_URL")
 
@@ -155,4 +156,12 @@ async def get_order(order_id: uuid.UUID):
         "idempotency_key": order.idempotency_key,
         "created_at": order.created_at.isoformat(),
         "updated_at": order.updated_at.isoformat(),
+    }
+
+@app.post("/reconcile")
+async def run_reconciler():
+    await reconcile()
+
+    return {
+        "status": "completed"
     }
