@@ -27,65 +27,113 @@ async def health():
 
 @app.post("/checkout")
 async def checkout(request: CheckoutRequest):
-    # App-level pre-check is an optimisation only.
-    # The DB UNIQUE constraint on idempotency_key is the real concurrency guarantee
-    # (see IntegrityError catch below).
+    # Application-level pre-check.
     session = SessionLocal()
     try:
         existing = (
             session.query(Order)
-            .filter_by(idempotency_key=request.idempotency_key)
+            .filter_by(idempotency_key = request.idempotency_key)
             .first()
         )
+
         if existing:
-            return {"order_id": str(existing.id), "status": existing.status}
+            return {
+                "order_id": str(existing.id),
+                "status": existing.status
+            }
+
     finally:
         session.close()
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{GATEWAY_URL}/charge",
-            json=request.model_dump(),
-        )
-    charge = response.json()
-
+    #
+    # Create the order FIRST.
+    #
     order_id = uuid.uuid4()
+
     order = Order(
-        id=order_id,
-        amount=request.amount,
-        currency=request.currency,
-        status="paid",
-        idempotency_key=request.idempotency_key,
-    )
-    payment = Payment(
-        id=uuid.uuid4(),
-        order_id=order_id,
-        charge_id=charge["charge_id"],
-        amount=request.amount,
-        currency=request.currency,
-        status=charge["status"],
+        id = order_id,
+        amount = request.amount,
+        currency = request.currency,
+        status = "pending",
+        idempotency_key = request.idempotency_key
     )
 
     session = SessionLocal()
+
     try:
         session.add(order)
-        session.add(payment)
         session.commit()
+
     except IntegrityError:
         session.rollback()
-        # A concurrent request beat us to the same idempotency_key — return their order.
+
         existing = (
             session.query(Order)
-            .filter_by(idempotency_key=request.idempotency_key)
+            .filter_by(idempotency_key = request.idempotency_key)
             .first()
         )
+
         if existing:
-            return {"order_id": str(existing.id), "status": existing.status}
+            return {
+                "order_id": str(existing.id),
+                "status": existing.status
+            }
+
         raise
+
     finally:
         session.close()
 
-    return {"order_id": str(order.id), "status": order.status}
+    #
+    # Charge the customer.
+    #
+    async with httpx.AsyncClient() as client:
+
+        response = await client.post(
+            f"{GATEWAY_URL}/charge",
+            json = request.model_dump()
+        )
+
+    #
+    # Lost confirmation.
+    #
+    if response.status_code != 200:
+
+        raise HTTPException(
+            status_code = response.status_code,
+            detail = response.json()["detail"]
+        )
+
+    charge = response.json()
+
+    payment = Payment(
+        id = uuid.uuid4(),
+        order_id = order_id,
+        charge_id = charge["charge_id"],
+        amount = request.amount,
+        currency = request.currency,
+        status = charge["status"]
+    )
+
+    session = SessionLocal()
+
+    try:
+
+        order = session.get(Order, order_id)
+
+        order.status = "paid"
+
+        session.add(payment)
+
+        session.commit()
+
+    finally:
+        session.close()
+
+    return {
+        "order_id": str(order_id),
+        "status": "paid"
+    }
 
 
 @app.get("/orders/{order_id}")
