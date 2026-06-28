@@ -58,3 +58,16 @@ async def get_charges():
         "count": len(charges),
         "charges": list(charges.values())
     }
+    
+@app.get("/charge/{idempotency_key}")
+async def get_charge(idempotency_key: str):
+
+    charge = charges.get(idempotency_key)
+
+    if charge is None:
+        raise HTTPException(
+            status_code = 404,
+            detail = "Charge not found."
+        )
+
+    return charge
