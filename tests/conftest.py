@@ -58,3 +58,16 @@ def idempotency_key():
     Unique key for every test.
     """
     return str(uuid4())
+
+@pytest.fixture(autouse=True)
+def reset_gateway_chaos():
+    """
+    Ensure each test starts with the gateway in a clean state.
+    """
+
+    httpx.post(
+        f"{GATEWAY_URL}/_chaos",
+        json={
+            "mode": None
+        }
+    )
