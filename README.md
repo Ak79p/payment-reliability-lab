@@ -56,7 +56,7 @@ Every test asserts against the **database and the gateway's own record**, never 
 
 A happy-path checkout test confirms the full flow works end to end — the trustworthy foundation every failure test builds on.
 
-> A full incident write-up of the flagship scenario — symptom, evidence trail, root cause, recovery, and the catching test — is in [`INCIDENT_PLAYBOOK.md`](./INCIDENT_PLAYBOOK.md).
+> A full incident write-up of the flagship scenario — symptom, evidence trail, root cause, recovery, and the catching test — is in [`INCIDENT_PLAYBOOK.md`](./docs/INCIDENT_PLAYBOOK.md).
 
 ---
 
@@ -168,9 +168,10 @@ A natural next step is wiring in **Stripe test mode** (free, no real money) as a
 ├── tests/                # pytest suite — integration tests + harness
 ├── images/               # Architecture diagram
 ├── docker-compose.yml
-├── INCIDENT_PLAYBOOK.md  # Flagship incident write-up
-├── ARCHITECTURE.md       # Detailed code + design walkthrough
-└── SCENARIOS.md          # Failure scenarios in depth
+└── docs/
+    ├── ARCHITECTURE.md       # Detailed code + design walkthrough
+    ├── INCIDENT_PLAYBOOK.md  # Flagship incident write-up
+    └── SCENARIOS.md          # Failure scenarios in depth
 ```
 
-For a deeper walkthrough of how the code maps to the architecture and how the test automation connects to the SUT, see [`ARCHITECTURE.md`](./ARCHITECTURE.md) and [`SCENARIOS.md`](./SCENARIOS.md).
+For a deeper walkthrough of how the code maps to the architecture and how the test automation connects to the SUT, see [`ARCHITECTURE.md`](./docs/ARCHITECTURE.md) and [`SCENARIOS.md`](./docs/SCENARIOS.md).
