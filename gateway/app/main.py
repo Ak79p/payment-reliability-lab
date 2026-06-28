@@ -1,3 +1,4 @@
+import asyncio
 from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from app.models import ChargeRequest, ChaosRequest
@@ -41,6 +42,15 @@ async def charge(request: ChargeRequest):
             status_code = 504,
             detail = "Charge succeeded but confirmation was lost."
         )
+
+    elif chaos["mode"] == "timeout_ambiguous":
+        # Charge is already recorded above. Hang long enough that the
+        # caller's HTTP client times out — no status code is ever sent.
+        # The caller cannot distinguish "charge never happened" from
+        # "charge happened, response was lost in transit."
+        chaos["mode"] = None
+
+        await asyncio.sleep(10)
 
     return response
 

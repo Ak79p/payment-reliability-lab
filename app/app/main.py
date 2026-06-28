@@ -88,11 +88,19 @@ async def checkout(request: CheckoutRequest):
     #
     # Charge the customer.
     #
-    async with httpx.AsyncClient() as client:
+    try:
+        async with httpx.AsyncClient() as client:
 
-        response = await client.post(
-            f"{GATEWAY_URL}/charge",
-            json = request.model_dump()
+            response = await client.post(
+                f"{GATEWAY_URL}/charge",
+                json = request.model_dump(),
+                timeout = 5.0
+            )
+
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code = 502,
+            detail = "Payment outcome unknown; order persisted as pending and will be reconciled."
         )
 
     #
