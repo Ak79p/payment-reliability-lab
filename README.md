@@ -2,7 +2,7 @@
 
 **Testing the seam where payments break:** the customer is charged, but the order never records it. This project reproduces that failure on demand and proves the system recovers — asserting against the money's real location, never an HTTP `200`.
 
-![Architecture](images/architecture.svg)
+![Architecture](images/architecture-2.svg)
 
 A containerized **Order Service** (the system under test) charges a **fake, fault-injectable gateway** and writes to **PostgreSQL**. A pytest suite drives it and inspects the database directly.
 
